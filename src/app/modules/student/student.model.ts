@@ -1,11 +1,12 @@
 import { Schema, model } from 'mongoose';
 import {
-	Guardian,
-	LocalGuardian,
-	Student,
-	UserName,
+	StudentModel,
+	TGuardian,
+	TLocalGuardian,
+	TStudent,
+	TUserName,
 } from './student.interface';
-const userNameSchema = new Schema<UserName>({
+const userNameSchema = new Schema<TUserName>({
 	firstName: {
 		type: String,
 		required: [true, 'First Name is required'],
@@ -24,7 +25,7 @@ const userNameSchema = new Schema<UserName>({
 	},
 });
 
-const guardianSchema = new Schema<Guardian>({
+const guardianSchema = new Schema<TGuardian>({
 	fatherName: {
 		type: String,
 		trim: true,
@@ -53,7 +54,7 @@ const guardianSchema = new Schema<Guardian>({
 	},
 });
 
-const localGuradianSchema = new Schema<LocalGuardian>({
+const localGuardianSchema = new Schema<TLocalGuardian>({
 	name: {
 		type: String,
 		required: [true, 'Name is required'],
@@ -71,21 +72,53 @@ const localGuradianSchema = new Schema<LocalGuardian>({
 		required: [true, 'Address is required'],
 	},
 });
-const studentSchema = new Schema<Student>({
-	id: { type: String },
-	name: userNameSchema,
-	gender: ['male', 'female'],
+const studentSchema = new Schema<TStudent, StudentModel>({
+	id: { type: String, required: true, unique: true },
+	name: {
+		type: userNameSchema,
+		required: true,
+	},
+	gender: {
+		type: String,
+		enum: {
+			values: ['male', 'female', 'other'],
+			message:
+				"The gender can only be one of the following :'male','female' or 'other'",
+		},
+		required: true,
+	},
 	dateOfBirth: String,
-	email: { type: String, required: true },
+	email: { type: String, required: true, unique: true },
 	contactNo: { type: String, required: true },
 	emergencyContactNo: { type: String, required: true },
-	bloodGroup: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'],
+	bloodGroup: {
+		type: String,
+		enum: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'],
+		// required: true,
+	},
 	presentAddress: { type: String, required: true },
 	permanentAddress: { type: String, required: true },
-	guardian: guardianSchema,
-	localGuardian: localGuradianSchema,
+	guardian: {
+		type: guardianSchema,
+		required: true,
+	},
+	localGuardian: {
+		type: localGuardianSchema,
+		required: true,
+	},
 	profileImg: { type: String },
-	isActive: ['active', 'block'],
+	isActive: {
+		type: String,
+		enum: ['active', 'block'],
+		// required: true,
+		default: 'active',
+	},
 });
+// creating a custom statices method
 
-export const StudentModel = model<Student>('Student', studentSchema);
+studentSchema.statics.isUserExists = async function (id: string) {
+	const existingUser = await Student.findOne({ id });
+	return existingUser;
+};
+
+export const Student = model<TStudent, StudentModel>('Student', studentSchema);
