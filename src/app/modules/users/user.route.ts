@@ -1,12 +1,14 @@
-import express, { NextFunction, Request, Response } from 'express';
+import express from 'express';
+import validateRequest from '../../utils/validateRequest';
+import { studentValidations } from '../student/student.validation';
 import { UserController } from './user.controller';
 
 const router = express.Router();
 
-const verifyZOD = (req: Request, res: Response, next: NextFunction) => {
-	console.log('ZOD Verify');
-};
-
-router.post('/create-user', verifyZOD, UserController.createStudent);
+router.post(
+	'/create-user',
+	validateRequest(studentValidations.createStudentValidationSchema),
+	UserController.createStudent
+);
 
 export const UserRouter = router;

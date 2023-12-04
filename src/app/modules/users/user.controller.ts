@@ -6,8 +6,7 @@ import { UserServices } from './user.service';
 
 const createStudent: RequestHandler = catchAsync(async (req, res, next) => {
 	const { password, student: studentData } = req.body;
-	//data a schema validation using zod
-	// const zodPassData = studentValidationSchema.parse(studentData);
+
 	//will call services function to send this data
 	const result = await UserServices.createStudentIntoDB(password, studentData);
 	// send res
