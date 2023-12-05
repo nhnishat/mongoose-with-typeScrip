@@ -1,6 +1,6 @@
 import Joi from 'joi';
 
-const userNameSchema = Joi.object({
+const userNameValidationSchema = Joi.object({
 	firstName: Joi.string()
 		.required()
 		.trim()
@@ -11,7 +11,7 @@ const userNameSchema = Joi.object({
 	lastName: Joi.string().required(),
 });
 
-const guardianSchema = Joi.object({
+const guardianValidationSchema = Joi.object({
 	fatherName: Joi.string().required(),
 	fatherOccupation: Joi.string().required(),
 	fatherContactNo: Joi.string().required(),
@@ -20,7 +20,7 @@ const guardianSchema = Joi.object({
 	motherContactNo: Joi.string().required(),
 });
 
-const localGuardianSchema = Joi.object({
+const localGuardianValidationSchema = Joi.object({
 	name: Joi.string().required(),
 	occupation: Joi.string().required(),
 	contactNo: Joi.string().required(),
@@ -30,13 +30,13 @@ const localGuardianSchema = Joi.object({
 export const studentValidationSchema = Joi.object({
 	id: Joi.string().required(),
 	password: Joi.string().required().max(30),
-	name: userNameSchema.required(),
+	name: userNameValidationSchema.required(),
 	gender: Joi.string().valid('male', 'female', 'other').required(),
 	dateOfBirth: Joi.string(),
 	email: Joi.string().email().required(),
 	contactNo: Joi.string().required(),
 	emergencyContactNo: Joi.string().required(),
-	bloogGroup: Joi.string().valid(
+	bloodGroup: Joi.string().valid(
 		'A+',
 		'A-',
 		'B+',
@@ -48,8 +48,8 @@ export const studentValidationSchema = Joi.object({
 	),
 	presentAddress: Joi.string().required(),
 	permanentAddress: Joi.string().required(),
-	guardian: guardianSchema.required(),
-	localGuardian: localGuardianSchema.required(),
+	guardian: guardianValidationSchema.required(),
+	localGuardian: localGuardianValidationSchema.required(),
 	profileImg: Joi.string(),
 	isActive: Joi.string().valid('active', 'blocked').default('active'),
 });

@@ -1,10 +1,13 @@
 import config from '../../config';
+import { TAcademicSemester } from '../academicSemester/academicSemester.interface';
+import { AcademicSemester } from '../academicSemester/academicSemester.model';
 import { TStudent } from '../student/student.interface';
 import { Student } from '../student/student.model';
 import { User } from './user-model';
+import { generateStudentId } from './user.utils';
 import { TUser } from './users.interface';
 
-const createStudentIntoDB = async (password: string, studentData: TStudent) => {
+const createStudentIntoDB = async (password: string, payload: TStudent) => {
 	// if (await User.isUserExists(studentData.id)) {
 	// 	throw new Error('user already exists');
 	// }
@@ -18,17 +21,23 @@ const createStudentIntoDB = async (password: string, studentData: TStudent) => {
 	// set student role
 	userData.role = 'student';
 
+	// find academic semester info
+	const admissionSemesters =
+		((await AcademicSemester.findById(
+			payload.admissionSemester
+		)) as TAcademicSemester) || null;
+
 	// set manually id
-	userData.id = '209010001';
+	userData.id = await generateStudentId(admissionSemesters);
 	// create a user
 	const newUser = await User.create(userData);
 
 	// create a student
 	if (Object.keys(newUser).length) {
 		// set id, _id as
-		studentData.id = newUser.id; //ambeding id
-		studentData.user = newUser._id; //reference _id
-		const newStudent = await Student.create(studentData);
+		payload.id = newUser.id; //ambeding id
+		payload.user = newUser._id; //reference _id
+		const newStudent = await Student.create(payload);
 		return newStudent;
 	}
 };
